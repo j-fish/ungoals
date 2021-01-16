@@ -5,6 +5,8 @@ $dataProcessor = new HTTPDataProcessor();
 $cli = isset($_GET['c']) ? $dataProcessor->processHttpFormData($_GET['c']) : '';
 $goal = isset($_GET['goal']) ? $dataProcessor->processHttpFormData($_GET['goal']) : '';
 
+$indicator = isset($_POST['indicator']) ? $dataProcessor->processHttpFormData($_POST['indicator']) : '';
+
 $goalsmdl = new GoalModel();
-$data = $goalsmdl->selectGoal('goal13');
+$data = $goalsmdl->selectGoalByIndicator('goal13', $indicator);
 echo json_encode($data);

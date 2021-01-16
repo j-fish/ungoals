@@ -21,6 +21,7 @@
     <?php include $_SERVER['DOCUMENT_ROOT'].'app/view/footer.php'; ?>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/jquery-3.5.1.min.js"></script>
+    <?php include $_SERVER['DOCUMENT_ROOT'].'app/view/data.chart.php'; ?>
     <script src="/js/app/app.js"></script>      
   </body>
 </html>

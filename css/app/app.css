@@ -1,3 +1,63 @@
+body, main {
+	background-color: rgb(250,250,250);
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('http://themes.googleusercontent.com/static/fonts/opensans/v5/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff') format('woff');
+}
+body {
+	font-family: 'open sans' !important;
+}
 main > .container {
   padding: 60px 15px 0;
+}
+#chartjs-tooltip {
+	opacity: 1;
+	background: rgba(0, 0, 0, .7);
+	position: absolute;
+	color: white;
+	border-radius: 3px;
+	margin-top: 60px;
+	margin-left: 60px;
+	top: 0;
+	left: 0; 
+	/*-webkit-transition: all .1s ease;
+	transition: all .1s ease;
+	pointer-events: none;*/
+	/*-webkit-transform: translate(10%, 0);
+	transform: translate(10%, 0);*/
+}
+.chartjs-tooltip-key {
+	display: inline-block;
+}
+.ungoal-detail-dialog {
+	/* table that contains details on selected node */
+}
+
+div.selectables-container {
+	margin-top: 6px;
+	margin-bottom: 22px;
+}
+span.selectable-item-info {
+	float: right;
+	vertical-align: center;
+	margin: 2px;
+	margin-left: 12px;
+}
+li.selectable-container {
+}
+li.selectable-container:hover {
+	background-color: lightgray !important;
+	cursor: pointer;
+}
+label.selectable-label {
+	margin-left: 6px;
+}
+ul#dropdown-countries-ul {
+	background-color: rgba(200,200,200,0.3) !important;
+	overflow: auto;
+	border: 1px solid rgba(0,0,0,0.3)
 }

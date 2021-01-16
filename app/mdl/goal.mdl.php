@@ -19,6 +19,19 @@ class GoalModel extends Model
     return $data;
   }
 
+  public function selectGoalByIndicator($goal, $indicator)
+  {
+    $query = $this->getGoalByIndicatorQuery($goal);
+    $qLib = $this->getQuerylib();
+    $stmt = $this->getCnxdb()->prepare($query);
+    $stmt->bindParam(":pIndicator", $indicator, PDO::PARAM_STR);
+    $stmt->execute();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return $data;
+  }
+
+
   public function selectGoalMaxPK($max_pk)
   {
     $qLib = $this->getQuerylib();
@@ -30,21 +43,16 @@ class GoalModel extends Model
     return $data;
   }
 
-  public function selectByPk($pk, $goal) 
-  {
-    $qLib = $this->getQuerylib();
-    $stmt = $this->getCnxdb()->prepare($qLib::SELECT_GOAL_BY_PK);
-    $stmt->bindParam(":pTable", $goal, PDO::PARAM_STR);
-    $stmt->bindParam(":pId_pk", $pk, PDO::PARAM_);
-    $stmt->execute();
-    $data = $stmt->fetch(PDO::FETCH_ASSOC); 
-    return $data;
-  }
-
   private function getGoalQuery($goal)
   {
     $qLib = $this->getQuerylib();
     if (strcmp($goal, 'goal13') === 0) return $qLib::SELECT_ALL_FROM_GOAL13;
+  }
+
+  private function getGoalByIndicatorQuery($goal)
+  {
+    $qLib = $this->getQuerylib();
+    if (strcmp($goal, 'goal13') === 0) return $qLib::SELECT_ALL_FROM_GOAL13_BY_INDICATOR;
   }
 
 }
