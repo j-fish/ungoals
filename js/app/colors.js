@@ -272,6 +272,8 @@ class AppColors {
 	}
 
 	getLineColor(ctx) { return COLORS[ctx.datasetIndex % COLORS.length]; }
+  getColor(datasetI) { return COLORS[datasetI % COLORS.length]; }
+
 
   /*getLineColor(ctx, value, index, maxValueForDetailedTools) { 
     var res = undefined;

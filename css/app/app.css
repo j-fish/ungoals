@@ -38,8 +38,6 @@ main > .container {
 }
 
 div.selectables-container {
-	margin-top: 6px;
-	margin-bottom: 22px;
 }
 span.selectable-item-info {
 	float: right;
@@ -60,4 +58,8 @@ ul#dropdown-countries-ul {
 	background-color: rgba(200,200,200,0.3) !important;
 	overflow: auto;
 	border: 1px solid rgba(0,0,0,0.3)
+}
+button.selected-dataset-selector {
+	margin-top: 4px;
+	margin-right: 4px;
 }

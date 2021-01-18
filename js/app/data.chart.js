@@ -4,6 +4,9 @@ class DataChart {
   chart
   config
   json
+  maxValue = 0
+  minValue = Number.MAX_SAFE_INTEGER
+  seriesDesc = ''
 
   constructor() {
   } 
@@ -18,9 +21,6 @@ class DataChart {
     var nodeLabelTool = new NodeLabelTool();
     var minTimePeriod = Number.MAX_SAFE_INTEGER;
     var maxTimePeriod = 0;
-    var maxValue = 0;
-    var minValue = Number.MAX_SAFE_INTEGER;
-    var seriesDesc = '';
 
     let geoAreas = new Map();
     for(var k in json) {
@@ -41,10 +41,13 @@ class DataChart {
 
       minTimePeriod = json[k].TimePeriod < minTimePeriod ? json[k].TimePeriod : minTimePeriod;
       maxTimePeriod = json[k].TimePeriod > maxTimePeriod ? json[k].TimePeriod : maxTimePeriod;
-      minValue = parseInt(json[k].Value) < minValue ? parseInt(json[k].Value) : minValue;
-      maxValue = parseInt(json[k].Value) > maxValue ? parseInt(json[k].Value) : maxValue;
-      if (seriesDesc === '') seriesDesc = json[k].SeriesDescription;
+      this.minValue = parseInt(json[k].Value) < this.minValue ? parseInt(json[k].Value) : this.minValue;
+      this.maxValue = parseInt(json[k].Value) > this.maxValue ? parseInt(json[k].Value) : this.maxValue;
+      if (this.seriesDesc === '') this.seriesDesc = json[k].SeriesDescription;
     }
+
+    var minv = this.minValue;
+    var maxv = this.maxValue;
 
     // Append missing years based on max and min years found in pulled datasets.
     geoAreas.forEach(function(value, key, map) {
@@ -80,7 +83,7 @@ class DataChart {
         selected: 'false'
       };
 
-      maxValueForDetailedTools = parseInt((maxValue / 100) * 10);
+      maxValueForDetailedTools = parseInt((maxv / 100) * 10);
       value.forEach(function(val) {
         if (val > maxValueForDetailedTools) {
           dataset.label = labelTool.custom(key, json);
@@ -100,18 +103,19 @@ class DataChart {
     }
 
     // Override drawline.
-    var originalController = Chart.controllers.line;
+    /*var originalController = Chart.controllers.line;
     Chart.controllers.line = Chart.controllers.line.extend({
       draw: function() {
         originalController.prototype.draw.call(this, arguments);
         nodeLabelTool.buildNodeLabel(this);
       }
-    });
+    });*/
 
     this.f_datasets = datasets;
     datasets = this.startUpFilter(this.f_datasets);
 
     // Finally build chart.
+    var l_seriesDesc = this.seriesDesc;
     var canvas = document.getElementById('data-chart');
     this.config = {
       type: "line",
@@ -129,11 +133,6 @@ class DataChart {
         elements: {
           point: {
             backgroundColor: colors.getLineColor,
-            /*function(context) {
-              var index = context.dataIndex;
-              var value =  datasets[index];
-              return colors.getLineColor(context, value, index, maxValueForDetailedTools);
-            },*/
             pointStyle: 'circle',
             radius: 3,
             hoverRadius: 12,
@@ -142,17 +141,7 @@ class DataChart {
           line: {
             fill: false,
             backgroundColor: colors.getLineColor,
-            /*function(context) {
-              var index = context.dataIndex;
-              var value =  datasets[index];
-              return colors.getLineColor(context, value, index, maxValueForDetailedTools);
-            },*/
             borderColor: colors.getLineColor,
-            /*function(context) {
-              var index = context.dataIndex;
-              var value =  datasets[index];
-              return colors.getLineColor(context, value, index, maxValueForDetailedTools);
-            },*/
             borderWidth: 1
           },
         },
@@ -166,20 +155,18 @@ class DataChart {
           }],
           yAxes: [{
             ticks: {
-                min: 0,
-                max: 1000 //maxValue + (maxValue * 0.1)
+                min: minv,
+                max: maxv + (maxv * 0.1)
               },
             display: true,
             scaleLabel: {
                 display: true,
-                labelString: seriesDesc
+                labelString: l_seriesDesc
             }
           }]
         },
         tooltips: {
-          //filter: function (tooltipItem) {
-          //   return tooltipItem.value > maxValueForDetailedTools;
-          //}, 
+          //filter: function (tooltipItem) { return tooltipItem.value > maxValueForDetailedTools; }, 
           bodyFontFamily: '2px consolas',         
           enabled: false,
           mode: 'point',
@@ -200,8 +187,6 @@ class DataChart {
   }
 
   getDataset(key) {
-
-    console.log(key);
     for (var i = 0; i < this.f_datasets.length; ++i) {
       if (this.f_datasets[i].key == key) {
         return this.f_datasets[i].dataset;
