@@ -271,38 +271,35 @@ class AppColors {
 	constructor() {
 	}
 
-	getLineColor(ctx) { return COLORS[ctx.datasetIndex % COLORS.length]; }
-  getColor(datasetI) { return COLORS[datasetI % COLORS.length]; }
+	getLineColor(ctx) {
+    return ctx.dataset.color;
+  }
 
+  getColor(datasetI) { 
+    return COLORS[datasetI % COLORS.length]; 
+  }
 
-  /*getLineColor(ctx, value, index, maxValueForDetailedTools) { 
-    var res = undefined;
-    if (value !== undefined) {
-      for (var i = 0; i < value.data.length; ++i) {
-        if (value.data[i] > maxValueForDetailedTools) {
-            console.log(COLORS[ctx.datasetIndex % COLORS.length]);
-            res = COLORS[ctx.datasetIndex % COLORS.length];
-            break;
-        }
-      }
-    }
-
-    return res === undefined ? COLORS[0] : res;
-  }*/
-
-	getInactiveDataColor(ctx) { return 'black'; }
+	getInactiveDataColor(ctx) { 
+    return 'black'; 
+  }
 
 	static hexToRgbA(hex, opacity) {
     var c;
     if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-    c = hex.substring(1).split('');
-    if (c.length== 3) { c= [c[0], c[0], c[1], c[1], c[2], c[2]]; }
-    c = '0x' + c.join('');
-    return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',') + ',' + opacity + ')';
-  }
+      c = hex.substring(1).split('');
+      if (c.length== 3) { c= [c[0], c[0], c[1], c[1], c[2], c[2]]; }
+      c = '0x' + c.join('');
+      return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',') + ',' + opacity + ')';
+    }
     throw new Error('Bad Hex');
   }
 
-  transparentize(ctx) { return AppColors.hexToRgbA(COLORS[ctx.datasetIndex % COLORS.length], 0.6); }
+  transparentize(ctx) { 
+    return AppColors.hexToRgbA(COLORS[ctx.datasetIndex % COLORS.length], 0.6); 
+  }
+
+  transparentizeBackground(ctx) { 
+    return AppColors.hexToRgbA(ctx.dataset.color, 0.6);
+  }
 
 }

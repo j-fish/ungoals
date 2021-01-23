@@ -16,6 +16,10 @@
 						  <button class="btn btn-light btn-sm" type="button" id="dropdown-countries-select-none" style="margin-left: 12px;">
 						  	Select none
 						  </button>
+						  <br>
+						  <select class="form-select form-select-sm mb-3 bg-light" id="selected-color" name="selected-color" 
+						  	aria-label="Choose a color for selected dataset(s)">
+						  </select>
 				    </li>
 				  </ul>
 			  </div>
@@ -25,9 +29,12 @@
 			<div class="col-lg-6">
 				<div class="input-group input-group-sm mb-3">
 				  <span class="input-group-text" id="xaxis-low-value">x-axis low value</span>
-				  <input type="number" id="xaxis-min-value" step="50" value="" class="form-control" aria-label="" aria-describedby="xaxis-low-value">
+				  <input type="number" id="xaxis-min-value" step="50" value="" class="form-control" aria-label="" aria-describedby="xaxis-low-value">				  
 				  <span class="input-group-text" id="xaxis-high-value">x-axis high value</span>
 				  <input type="number" id="xaxis-max-value" step="50" value="" class="form-control" aria-label="" aria-describedby="xaxis-high-value">
+				  <button class="btn btn-secondary btn-sm" type="button" id="xaxis-reset-values" data="">
+				  	Reset to initial values
+				  </button>
 				</div>
 			</div>
 		</div>
@@ -39,3 +46,5 @@
 	  </div>
   </div>
 </main>
+<!-- detailled data view container -->
+<div id="detailled-data-view-container" class="toast-container position-absolute top-0 end-0 p-3" style="margin-top: 58px;"></div>

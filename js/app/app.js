@@ -1,27 +1,50 @@
-var summarizeDataset = function(dataset) {
+const loadModalDataView = function(key, datachart) {
+	var tooltipData = datachart.getDataset(key).label;
+	var id = 'detailled-data-body-' + datachart.getIndexOf(key);
+	var toastid = 'toast-' + id;
+	var bgcolor = 'background-color:' + datachart.getDataset(key)._meta[0].dataset._model.backgroundColor;
+	var jsonData = [{ 'title': key, 'data': tooltipData, 'id': id, 'bgcolor': bgcolor, 'tid': toastid }];
+	let transform = {'<>':'div','class':'toast','id':'${tid}','role':'alert','aria-live':'assertive','aria-atomic':'true',
+		'data-bs-autohide':'false','html':[
+      {'<>':'div','class':'toast-header','style':'${bgcolor}','html':[
+      		{'<>':'strong','class':'me-auto','text':'${title}'},
+      		{'<>':'small','class':'text-muted','text':'${title}'},
+      		{'<>':'button','class':'btn-close','data-bs-dismiss':'toast','aria-label':'Close'}
+      	]},
+      {'<>':'div','class':'toast-body detailled-data-body','id':'${id}'}
+    ]};
+  // TODO : call api for detailled data completion.
+	$('#detailled-data-view-container').append(json2html.transform(jsonData, transform));
+	$('#' + id).html(tooltipData);
+	$('#' + toastid).toast('show');
+	$('#' + toastid).on('hidden.bs.toast', function () {
+  	$(this).remove();
+	});
+}
+const summarizeDataset = function(dataset) {
 	var sum = 0.0; 
 	for (var i = 0; i < dataset.length; ++i) sum += parseFloat(dataset[i]) == NaN ? 0.0 : parseFloat(dataset[i]);
 	return sum;
 }
-var addData = function(datachart, chart, data, key) {
+const addData = function(datachart, chart, data, key) {
 	data.selected = 'checked';
 	var tool = new LabelTool();
 	data.label = tool.custom(key, datachart.getJson());
-  chart.config.data.datasets.push(data);
+	if (data.color === undefined) data.color = $('#selected-color').val();
+	var i = chart.config.data.datasets.push(data);
   chart.update();
 }
-var removeData = function(datachart, chart, data, key) {
+const removeData = function(datachart, chart, data, key) {
 	data.selected = 'false';
 	for (var i = 0; i < chart.config.data.datasets.length; ++i) {
-		if (chart.config.data.datasets[i].label.indexOf('<b>' + key + '</b>')) {
-			console.log(datachart.f_datasets[i]);
+		if (chart.config.data.datasets[i].label.toString().indexOf(key) > 0) {
+			chart.config.data.datasets[i].color = undefined;
 			chart.config.data.datasets.splice(i, 1);
-			break;
 		}
 	}
 	chart.update();
 }
-var applyTickChange = function(chart, low, high) {
+const applyTickChange = function(chart, low, high) {
 	var yaxe = chart.config.options.scales.yAxes[0];
 	yaxe.ticks.max = parseFloat(high);
 	yaxe.ticks.min = parseFloat(low);
@@ -29,7 +52,7 @@ var applyTickChange = function(chart, low, high) {
 	chart.config.options.scales.yAxes.push(yaxe);
 	chart.update(chart.config);
 }
-var updateSelectedList = function(datachart) {
+const updateSelectedList = function(datachart) {
 	$('#selected-datasets').empty();
 	var colors = new AppColors();
 	for (var i = 0; i < datachart.f_datasets.length; ++i) {
@@ -38,11 +61,26 @@ var updateSelectedList = function(datachart) {
 			$(btn).addClass('btn btn-sm selected-dataset-selector')
 				.html(datachart.f_datasets[i].key)
 				.attr('data', datachart.f_datasets[i].key)
-				.css('background-color', colors.getColor(datachart.f_datasets[i].dataset._meta[0].dataset._datasetIndex));
-			// todo: append all meta data necessary for fine details viz.
+				.css('background-color', datachart.f_datasets[i].dataset._meta[0].dataset._model.backgroundColor)
+				.on('click', function() { loadModalDataView($(this).attr('data'), datachart); });
 			$('#selected-datasets').append(btn);
 		}
 	}
+}
+const setupData = [{ geoarea: 'China', color: '#ff0000' }];
+const setup = function(datachart, chart) {
+	var tool = new LabelTool();
+	for (var i = 0; i < setupData.length; ++i) {
+		var data = datachart.getDataset(setupData[i].geoarea);
+		data.selected = 'checked';
+		data.label = tool.custom(setupData[i].geoarea, datachart.getJson());
+		if (data.color === undefined) data.color = setupData[i].color;
+		var j = chart.config.data.datasets.push(data);
+		$("input.data-selectable").each(function() {
+			if ($(this).val() === setupData[i].geoarea) $(this).prop('checked', true);
+		});
+	}
+	chart.update();
 }
 
 $(document).ready(function() {
@@ -75,12 +113,15 @@ $(document).ready(function() {
 					'selected':datasets[i].dataset.selected
 				}];
 				let transform = {'<>':'li','class':'dropdown-item selectable-container','html':[
-		          {'<>':'input','type':'checkbox','class':'form-check-input data-selectable','id':'${id}','value':'${key}','data':'${selected}'},
-		          {'<>':'label','class':'selectable-label','text':'${key}','for':'${id}'},
-		          {'<>':'span','text':'sum of Mg/Co2 per year: ${sum}','class':'badge bg-secondary rounded-pill selectable-item-info'}
-		        ]};
-				$("#dropdown-countries-ul").append(json2html.transform(jsonData,transform));
+	          {'<>':'input','type':'checkbox','class':'form-check-input data-selectable','id':'${id}','value':'${key}','data':'${selected}'},
+	          {'<>':'label','class':'selectable-label','text':'${key}','for':'${id}'},
+	          {'<>':'span','text':'sum of Mg/Co2 per year: ${sum}','class':'badge bg-secondary rounded-pill selectable-item-info'}
+	        ]};
+				$("#dropdown-countries-ul").append(json2html.transform(jsonData, transform));
 			}
+
+			let transform = {'<>':'option','value':'${value}','style':'background-color: ${value}','html':'${value}'};
+			$("#selected-color").append(json2html.transform(JSON.stringify(COLORS), transform));
 
 			$("input.data-selectable").each(function() {
 				if ($(this).attr('data') == 'checked') $(this).prop('checked', true);
@@ -97,8 +138,11 @@ $(document).ready(function() {
 			});
 
 			$('#xaxis-min-value').val(parseInt(datachart.minValue));
-			$('#xaxis-max-value').val(parseInt(datachart.maxValue));
+			$('#xaxis-max-value').val(parseInt(datachart.maxValue + (datachart.maxValue * datachart.maxxfactor)));
+			$('#xaxis-reset-values').attr('data', parseInt(datachart.minValue) + '#' + 
+				(datachart.maxValue + (datachart.maxValue * datachart.maxxfactor)));
 
+			setup(datachart, datachart.chart);
 			updateSelectedList(datachart);
 
     }, error: function(jqXHR, textStatus, errorThrown) {
@@ -134,13 +178,11 @@ $(document).ready(function() {
 
 	$('#dropdown-countries-select-none').on('click', function(event) {
   	$("input.data-selectable").each(function() {
-			if ($(this).is(':checked')) {
-				$(this).attr('data', 'false');
-				$(this).prop('checked', false);
-				removeData(datachart, datachart.chart, datachart.getDataset($(this).val()), $(this).val());
-			}
+			$(this).attr('data', 'false');
+			$(this).prop('checked', false);
+			removeData(datachart, datachart.chart, datachart.getDataset($(this).val()), $(this).val());
 		});
-		updateSelectedList(datachart);
+		$('#selected-datasets').empty();
 	});
 
 	$('#xaxis-min-value').change(function(){
@@ -156,5 +198,26 @@ $(document).ready(function() {
 	$('#xaxis-max-value').keyup(function(){
 		if (!isNaN($(this).val())) applyTickChange(datachart.chart, $('#xaxis-min-value').val(), $(this).val());
 	});
-	
+
+	$('#xaxis-reset-values').on('click', function() {
+		var xaxis = $('#xaxis-reset-values').attr('data').split('#');
+		$('#xaxis-min-value').val(parseInt(xaxis [0]));
+		$('#xaxis-max-value').val(parseInt(xaxis [1]));
+		applyTickChange(datachart.chart, parseInt(xaxis [0]), parseInt(xaxis[1]));
+	});
+
+	function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+  }
+  
+  var canvas = document.getElementById('data-chart');
+	canvas.addEventListener('click', function(evt) {
+	  var mousePos = getMousePos(canvas, evt);
+	  var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+	  }, false);
+
 });

@@ -7,6 +7,7 @@ class DataChart {
   maxValue = 0
   minValue = Number.MAX_SAFE_INTEGER
   seriesDesc = ''
+  maxxfactor = 0.1
 
   constructor() {
   } 
@@ -14,7 +15,6 @@ class DataChart {
   build(json) {
 
     this.json = json;
-    var maxValueForDetailedTools;
     var colors = new AppColors();
     var tooltipCustom = new ToolTips();
     var labelTool = new LabelTool();
@@ -74,22 +74,13 @@ class DataChart {
         unidata.push(v);
       });
       var dataset = { 
-        //label: labelTool.custom(key, json), // the content of tool tip
         data: unidata,
-        fill: false, // will color area bellow line. 
+        fill: true, // will color area bellow line. 
         spanGaps: true,
         lineTension: 0,
         showLine: true,
         selected: 'false'
       };
-
-      maxValueForDetailedTools = parseInt((maxv / 100) * 10);
-      value.forEach(function(val) {
-        if (val > maxValueForDetailedTools) {
-          dataset.label = labelTool.custom(key, json);
-          dataset.selected = 'checked';
-        }
-      });
 
       datasets.push({ key, dataset });
     });
@@ -102,21 +93,13 @@ class DataChart {
       ++min;
     }
 
-    // Override drawline.
-    /*var originalController = Chart.controllers.line;
-    Chart.controllers.line = Chart.controllers.line.extend({
-      draw: function() {
-        originalController.prototype.draw.call(this, arguments);
-        nodeLabelTool.buildNodeLabel(this);
-      }
-    });*/
-
     this.f_datasets = datasets;
     datasets = this.startUpFilter(this.f_datasets);
 
     // Finally build chart.
     var l_seriesDesc = this.seriesDesc;
     var canvas = document.getElementById('data-chart');
+    var lmaxxfactor = this.maxxfactor;
     this.config = {
       type: "line",
       data: {
@@ -134,14 +117,14 @@ class DataChart {
           point: {
             backgroundColor: colors.getLineColor,
             pointStyle: 'circle',
-            radius: 3,
+            radius: 9,
             hoverRadius: 12,
-            hoverBackgroundColor: colors.transparentize
+            hoverBackgroundColor: colors.getLineColor
           },
           line: {
             fill: false,
-            backgroundColor: colors.getLineColor,
-            borderColor: colors.getLineColor,
+            backgroundColor: colors.transparentizeBackground,
+            borderColor: '#808080',
             borderWidth: 1
           },
         },
@@ -156,7 +139,7 @@ class DataChart {
           yAxes: [{
             ticks: {
                 min: minv,
-                max: maxv + (maxv * 0.1)
+                max: maxv + (maxv * lmaxxfactor)
               },
             display: true,
             scaleLabel: {
@@ -166,7 +149,6 @@ class DataChart {
           }]
         },
         tooltips: {
-          //filter: function (tooltipItem) { return tooltipItem.value > maxValueForDetailedTools; }, 
           bodyFontFamily: '2px consolas',         
           enabled: false,
           mode: 'point',
@@ -190,6 +172,14 @@ class DataChart {
     for (var i = 0; i < this.f_datasets.length; ++i) {
       if (this.f_datasets[i].key == key) {
         return this.f_datasets[i].dataset;
+      }
+    }
+  }
+
+  getIndexOf(key) {
+    for (var i = 0; i < this.f_datasets.length; ++i) {
+      if (this.f_datasets[i].key == key) {
+        return (i + 1) + Math.floor(Math.random() * 10000);  
       }
     }
   }
