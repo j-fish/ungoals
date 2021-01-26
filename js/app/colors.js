@@ -283,6 +283,13 @@ class AppColors {
     return 'black'; 
   }
 
+  rgba2rgb(rgba) {
+    // rgba(255,0,0,0.6)
+    rgba = rgba.substring(4, rgba.length - 1);
+    rgba = rgba.substring(1, rgba.length - 4);
+    return ('rgb(' + rgba + ')');
+  }
+
 	static hexToRgbA(hex, opacity) {
     var c;
     if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {

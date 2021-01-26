@@ -1,25 +1,30 @@
 const loadModalDataView = function(key, datachart) {
 	var tooltipData = datachart.getDataset(key).label;
 	var id = 'detailled-data-body-' + datachart.getIndexOf(key);
+	$('.toast').each(function() { if ($(this).attr('data') === key) $(this).remove(); });
 	var toastid = 'toast-' + id;
 	var bgcolor = 'background-color:' + datachart.getDataset(key)._meta[0].dataset._model.backgroundColor;
 	var jsonData = [{ 'title': key, 'data': tooltipData, 'id': id, 'bgcolor': bgcolor, 'tid': toastid }];
-	let transform = {'<>':'div','class':'toast','id':'${tid}','role':'alert','aria-live':'assertive','aria-atomic':'true',
-		'data-bs-autohide':'false','html':[
+	let transform = {'<>':'div','class':'toast','id':'${tid}','role':'alert','aria-live':'assertive',
+		'data':'${title}','aria-atomic':'true','data-bs-autohide':'false','html':[
       {'<>':'div','class':'toast-header','style':'${bgcolor}','html':[
       		{'<>':'strong','class':'me-auto','text':'${title}'},
-      		{'<>':'small','class':'text-muted','text':'${title}'},
+      		{'<>':'small','class':'text-muted','text':''},
       		{'<>':'button','class':'btn-close','data-bs-dismiss':'toast','aria-label':'Close'}
       	]},
       {'<>':'div','class':'toast-body detailled-data-body','id':'${id}'}
     ]};
-  // TODO : call api for detailled data completion.
+  	// TODO : call api for detailled data completion.
 	$('#detailled-data-view-container').append(json2html.transform(jsonData, transform));
 	$('#' + id).html(tooltipData);
-	$('#' + toastid).toast('show');
+	$('#' + toastid).on('show.bs.toast', function () {
+  	$('#thead-emissions-' + key.replace(/\s/g, '')).css('background-color', 
+  		datachart.getDataset(key)._meta[0].dataset._model.backgroundColor).css('opacity', '0.9');
+	});
 	$('#' + toastid).on('hidden.bs.toast', function () {
   	$(this).remove();
 	});
+	$('#' + toastid).toast('show');
 }
 const summarizeDataset = function(dataset) {
 	var sum = 0.0; 
@@ -54,15 +59,15 @@ const applyTickChange = function(chart, low, high) {
 }
 const updateSelectedList = function(datachart) {
 	$('#selected-datasets').empty();
-	var colors = new AppColors();
 	for (var i = 0; i < datachart.f_datasets.length; ++i) {
 		if (datachart.f_datasets[i].dataset.selected == 'checked') {
+			var bgcolor = datachart.f_datasets[i].dataset._meta[0].dataset._model.backgroundColor;
 			var btn = document.createElement('button');
 			$(btn).addClass('btn btn-sm selected-dataset-selector')
 				.html(datachart.f_datasets[i].key)
 				.attr('data', datachart.f_datasets[i].key)
-				.css('background-color', datachart.f_datasets[i].dataset._meta[0].dataset._model.backgroundColor)
-				.on('click', function() { loadModalDataView($(this).attr('data'), datachart); });
+				.css('background-color', bgcolor)
+				.on('click', function() { loadModalDataView($(this).attr('data'), datachart, bgcolor); });
 			$('#selected-datasets').append(btn);
 		}
 	}
@@ -76,8 +81,14 @@ const setup = function(datachart, chart) {
 		data.label = tool.custom(setupData[i].geoarea, datachart.getJson());
 		if (data.color === undefined) data.color = setupData[i].color;
 		var j = chart.config.data.datasets.push(data);
-		$("input.data-selectable").each(function() {
+		$('input.data-selectable').each(function() {
 			if ($(this).val() === setupData[i].geoarea) $(this).prop('checked', true);
+		});
+		$('#selected-color option').each(function() {
+			if ($(this).val() === setupData[i].color) {
+				$(this).attr('selected', 'selected');
+				$('#selected-color').css('background-color', setupData[i].color);
+			}
 		});
 	}
 	chart.update();
@@ -107,10 +118,10 @@ $(document).ready(function() {
 			for (var i = 0; i < datasets.length; ++i) {
 					
 				var jsonData = [{
-					'key':datasets[i].key,
-					'id':i,
-					'sum':summarizeDataset(datasets[i].dataset.data),
-					'selected':datasets[i].dataset.selected
+					'key': datasets[i].key,
+					'id': i,
+					'sum': summarizeDataset(datasets[i].dataset.data),
+					'selected': datasets[i].dataset.selected
 				}];
 				let transform = {'<>':'li','class':'dropdown-item selectable-container','html':[
 	          {'<>':'input','type':'checkbox','class':'form-check-input data-selectable','id':'${id}','value':'${key}','data':'${selected}'},
@@ -204,6 +215,10 @@ $(document).ready(function() {
 		$('#xaxis-min-value').val(parseInt(xaxis [0]));
 		$('#xaxis-max-value').val(parseInt(xaxis [1]));
 		applyTickChange(datachart.chart, parseInt(xaxis [0]), parseInt(xaxis[1]));
+	});
+
+	$('#selected-color').change(function() {
+		$(this).css('background-color', $(this).val());
 	});
 
 	function getMousePos(canvas, evt) {

@@ -106,8 +106,8 @@ class DataChart {
         labels: xlabels,
         datasets: datasets
       },
-      options: {        
-        hover: {mode: null},
+      options: {      
+        hover: {intersect: false},
         responsive: true,
         legend: {
           display: false,
@@ -116,16 +116,17 @@ class DataChart {
         elements: {
           point: {
             backgroundColor: colors.getLineColor,
+            borderColor: '#404040',
+            borderWidth: 1.5,
             pointStyle: 'circle',
-            radius: 9,
-            hoverRadius: 12,
+            radius: 6,
             hoverBackgroundColor: colors.getLineColor
           },
           line: {
             fill: false,
             backgroundColor: colors.transparentizeBackground,
-            borderColor: '#808080',
-            borderWidth: 1
+            borderColor: '#404040',
+            borderWidth: 1.5
           },
         },
         scales: {
@@ -153,8 +154,8 @@ class DataChart {
           enabled: false,
           mode: 'point',
           position: 'nearest',
-          intersect: false,
-          custom: tooltipCustom.custom
+          intersect: false
+          //custom: tooltipCustom.custom
         }
       }
     };

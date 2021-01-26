@@ -1,4 +1,4 @@
-<main class="flex-shrink-0">
+<main class="flex">
   <div class="container" style="margin-top: 24px">
 		<div class="row justify-content-md-start">
 	  	<div class="col-lg-12">
@@ -10,14 +10,17 @@
 				  <ul class="dropdown-menu dropdown-menu-lg-start" id="dropdown-countries-ul" aria-labelledby="dropdown-countries">
 				    <li>
 				    	<h6 class="dropdown-header">Select required countries...</h6>
-				    	<button class="btn btn-light btn-sm" type="button" id="dropdown-countries-select-all" style="margin-left: 12px;">
+				    	<button class="btn btn-secondary btn-sm" type="button" id="dropdown-countries-select-all" style="margin-left: 12px;">
 						    Select all geo areas and countries
 						  </button>
-						  <button class="btn btn-light btn-sm" type="button" id="dropdown-countries-select-none" style="margin-left: 12px;">
+						  <button class="btn btn-secondary btn-sm" type="button" id="dropdown-countries-select-none" style="margin-left: 12px;">
 						  	Select none
 						  </button>
+				    </li>
+				    <li style="padding-top: 4px; padding-left: 12px;">
+					  	<label class="text-muted" for="selected-color" style="margin-left: 4px;"><small>Currently selected line graph color  : </small></label>
 						  <br>
-						  <select class="form-select form-select-sm mb-3 bg-light" id="selected-color" name="selected-color" 
+						  <select class="form-select-sm mb-3" id="selected-color" name="selected-color" 
 						  	aria-label="Choose a color for selected dataset(s)">
 						  </select>
 				    </li>
@@ -25,14 +28,14 @@
 			  </div>
 			</div>
 		</div>
-		<div class="row justify-content-md-start" style="margin-top: 4px;">
+		<div class="row justify-content-md-start" style="margin-top: 8px;">
 			<div class="col-lg-6">
 				<div class="input-group input-group-sm mb-3">
 				  <span class="input-group-text" id="xaxis-low-value">x-axis low value</span>
 				  <input type="number" id="xaxis-min-value" step="50" value="" class="form-control" aria-label="" aria-describedby="xaxis-low-value">				  
 				  <span class="input-group-text" id="xaxis-high-value">x-axis high value</span>
 				  <input type="number" id="xaxis-max-value" step="50" value="" class="form-control" aria-label="" aria-describedby="xaxis-high-value">
-				  <button class="btn btn-secondary btn-sm" type="button" id="xaxis-reset-values" data="">
+				  <button class="btn btn-sm btn-secondary" type="button" id="xaxis-reset-values" data="">
 				  	Reset to initial values
 				  </button>
 				</div>
